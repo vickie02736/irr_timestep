@@ -1,7 +1,5 @@
 /data
 
-|                   | irr_imae          | conv_lstm         | (cae)             | cae_lstm          |
-|:-----------------:|:-----------------:|:-----------------:|:-----------------:|:-----------------:|
-| shallow_water     | * checkpoint <br> * loss <br >*rec  | Row 1, Column 3 |
-| weather_2m_temp   | Row 2, Column 2 | Row 2, Column 3 |
-
+<font color="red">This text is red.</font>
+<font color="blue">This text is blue.</font>
+<font color="#00FF00">This text is green with a hex code.</font>
