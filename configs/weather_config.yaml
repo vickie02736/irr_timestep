@@ -1,0 +1,74 @@
+test:
+  filename: "inner_test_file"
+  rollout_times: 2
+  timestep: 100
+  metric: 
+    - "MSE"
+    - "RMSE"
+    - "MAE" 
+    - "SSIM" 
+    - "PSNR"
+
+database: weather_2m_temperature
+image_size: [1, 32, 64]
+channels: 1
+seq_length: 10
+mask_method: "zeros"
+
+imae: 
+  num_layers: 6
+  nhead: 4
+  patch_size: [8, 16]
+  save_loss: '../data/weather_2m_temperature/imae/loss/'
+  save_checkpoint: '../data/weather_2m_temperature/imae/ckpt/'
+  save_reconstruct: '../data/weather_2m_temperature/imae/rec/'
+  train_batch_size: 2400
+  valid_batch_size: 2400
+  test_batch_size: 2400
+
+convlstm:
+  hidden_dim: [16, 32]
+  kernel_size: [3, 3]
+  num_layers: 2
+  save_loss: '../data/weather_2m_temperature/convlstm/loss/'
+  save_checkpoint: '../data/weather_2m_temperature/convlstm/ckpt/'
+  save_reconstruct: '../data/weather_2m_temperature/convlstm/rec/'
+  train_batch_size: 800
+  valid_batch_size: 800 
+  test_batch_size: 800
+
+cae:
+  latent_dim: 128
+  save_loss: '../data/weather_2m_temperature/cae/loss/'
+  save_checkpoint: '../data/weather_2m_temperature/cae/ckpt/'
+  save_reconstruct: '../data/weather_2m_temperature/cae/rec/'
+  train_batch_size: 32
+  valid_batch_size: 32 
+  test_batch_size: 32
+
+cae_lstm: 
+  cae_load_epoch: 4
+  hidden_dim: 1280
+  save_loss: '../data/weather_2m_temperature/caelstm/loss/'
+  save_checkpoint: '../data/weather_2m_temperature/caelstm/ckpt/'
+  save_reconstruct: '../data/weather_2m_temperature/caelstm/rec/'
+  train_batch_size: 32
+  valid_batch_size: 32 
+  test_batch_size: 32
+
+train:
+  loss_fn: "MSE"
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingLR"
+  learning_rate: 0.0001
+  rollout_times: 2
+ 
+valid: 
+  rollout_times: 2
+  metric: 
+    - "MSE"
+    - "RMSE"
+    - "MAE" 
+    - "SSIM" 
+    - "PSNR"
+  

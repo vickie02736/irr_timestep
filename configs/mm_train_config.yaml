@@ -1,0 +1,57 @@
+database: moving_mnist
+image_size: 64
+channels: 1
+seq_length: 5
+mask_method: "random"
+
+imae: 
+  num_layers: 2
+  nhead: 4
+  patch_size: 8
+  save_loss: '../data/moving_mnist/imae/loss/'
+  save_checkpoint: '../data/moving_mnist/imae/ckpt/'
+  save_reconstruct: '../data/moving_mnist/imae/rec/'
+  batch_size: 32
+
+convlstm:
+  hidden_dim: [32, 32]
+  kernel_size: [3, 3]
+  num_layers: 2
+  save_loss: '../data/moving_mnist/convlstm/loss/'
+  save_checkpoint: '../data/moving_mnist/convlstm/ckpt/'
+  save_reconstruct: '../data/moving_mnist/convlstm/rec/'
+  batch_size: 32
+
+cae:
+  latent_dim: 128
+  save_loss: '../data/moving_mnist/cae/loss/'
+  save_checkpoint: '../data/moving_mnist/cae/ckpt/'
+  save_reconstruct: '../data/moving_mnist/cae/rec/'
+  batch_size: 32
+
+cae_lstm: 
+  cae_load_epoch: 600
+  hidden_dim: 1280
+  save_loss: '../data/moving_mnist/caelstm/loss/'
+  save_checkpoint: '../data/moving_mnist/caelstm/ckpt/'
+  save_reconstruct: '../data/moving_mnist/caelstm/rec/'
+  batch_size: 16
+
+train:
+  loss_fn: "BCE"
+  optimizer: "RMSprop"
+  scheduler: "StepLR"
+  learning_rate: 0.0001
+  rollout_times: 2
+  
+
+
+valid: 
+  rollout_times: 2
+  metric: 
+    - "BCE"
+    - "MSE"
+    - "RMSE"
+    - "MAE" 
+    - "SSIM" 
+    - "PSNR"
