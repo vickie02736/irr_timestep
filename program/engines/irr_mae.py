@@ -45,12 +45,21 @@ class ImaeTrainer(Trainer, Evaluator):
                 loss = predict_loss + rollout_loss
 
             self.optimizer.zero_grad()
+
+            self.global_step += 1
+            if self.global_step < self.warmup_step:
+                lr = 1.0e-8 + (self.config["train"]['learning_rate'] - 1.0e-8) * self.global_step / self.warmup_step
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] = lr
+            else:
+                self.scheduler.step()
             self.scaler.scale(loss).backward(retain_graph=True)
             self.scaler.unscale_(self.optimizer)
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=0.1)
             self.scaler.step(self.optimizer)
             self.scaler.update()
-            self.scheduler.step()
+
+
 
             total_predict_loss += predict_loss.item()
             total_rollout_loss += rollout_loss.item()
@@ -93,13 +102,12 @@ class ImaeTrainer(Trainer, Evaluator):
                         loss = loss_fn(output, chunk)
                         running_losses[metric][j] += loss.item()
 
-                if i == 1 and epoch % 1 == 0:
+                if i == 1 and epoch % 10 == 0:
                     self.plot(epoch, origin_before_masked, origin_plot, 
                               output_chunks, target_chunks)
                             
 
             chunk_losses = {key: [val / len(self.eval_loader.dataset) for val in values] for key, values in running_losses.items()}
-            print(chunk_losses)
             save_losses(epoch, chunk_losses, os.path.join(self.save_loss_path, 'valid_losses.json'))
             
             if epoch % 5 == 0:

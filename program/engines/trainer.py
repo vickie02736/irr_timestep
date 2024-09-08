@@ -12,7 +12,6 @@ class Trainer(Engine):
         Engine.__init__(self, args)
         self.init_train_dataloader()
         self.init_loss_function()
-        self.global_step = 0
 
     def init_train_dataloader(self):
         if self.args.database == 'shallow_water':
@@ -62,8 +61,9 @@ class Trainer(Engine):
                 lr=self.config['train']['learning_rate'])
         else:
             pass
+
         # scheduler
-        self.schedular = self.create_scheduler()
+        self.scheduler = self.create_scheduler()
 
         # scaler
         self.scaler = torch.cuda.amp.GradScaler()
@@ -72,6 +72,7 @@ class Trainer(Engine):
             self.optimizer.load_state_dict(self.loaded_checkpoint['optimizer'])
             self.scheduler.load_state_dict(self.loaded_checkpoint['scheduler'])
             self.scaler.load_state_dict(self.loaded_checkpoint['scaler'])
+            self.global_step = self.loaded_checkpoint['global_step']
 
     def init_loss_function(self):
         if self.config['train']['loss_fn'] == 'MSE':
@@ -89,13 +90,15 @@ class Trainer(Engine):
             'optimizer': self.optimizer.state_dict(),
             'scheduler': self.scheduler.state_dict(),
             'scaler': self.scaler.state_dict(),
-            'epoch': epoch
+            'epoch': epoch,
+            'global_step': self.global_step,
         }
         torch.save(save_dict, save_path)
 
-    def create_scheduler(self, dataset_size): 
-        total_step = int(self.args.epochs * 0.05 * self.len_dataset // self.config[self.args.model_name]['train_batch_size'])
+    def create_scheduler(self): 
+        total_step = int(self.args.epochs * self.len_dataset // self.config[self.args.model_name]['train_batch_size'])
         cosine_step = int(total_step * 0.95)
-        return torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer, T_0=cosine_step, eta_min=1e-8)
+        self.warmup_step = int(total_step - cosine_step)
+        return optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer, T_0=cosine_step, eta_min=1e-8)
 
         

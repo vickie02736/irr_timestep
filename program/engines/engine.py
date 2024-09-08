@@ -33,6 +33,7 @@ class Engine:
             self.config = yaml.load(open("../configs/weather_config.yaml", "r"), Loader=yaml.FullLoader)
             self.data_config = yaml.load(open("../database/weather/config.yaml", "r"), Loader=yaml.FullLoader)
 
+
     def load_checkpoint(self): 
             self.save_checkpoint_path = self.config[self.args.model_name]['save_checkpoint']
             self.save_reconstruct_path = self.config[self.args.model_name]['save_reconstruct']
@@ -42,7 +43,8 @@ class Engine:
                 self.save_reconstruct_path = os.path.join(self.save_reconstruct_path, self.args.interpolation)
                 self.save_loss_path = os.path.join(self.save_loss_path, self.args.interpolation)
 
-            if self.args.resume_epoch == 1:
+            if self.args.resume_epoch == 1: 
+                self.global_step = 0
                 os.makedirs(self.save_checkpoint_path, exist_ok=True)
                 os.makedirs(self.save_reconstruct_path, exist_ok=True)
                 os.makedirs(self.save_loss_path, exist_ok=True)

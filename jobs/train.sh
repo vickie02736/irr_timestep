@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --job-name=imae_sw          # 作业名称
+#SBATCH --job-name=imae_wt          # 作业名称
 #SBATCH --account=PAS2490		    # Project ID
 #SBATCH --nodes=1                   # 节点数
 #SBATCH --ntasks-per-node=1         # 每个节点的任务数
-#SBATCH --cpus-per-task=6           # 每个任务使用的 CPU 核心数
+#SBATCH --cpus-per-task=3           # 每个任务使用的 CPU 核心数
 #SBATCH --gpus-per-node=1           # GPU per node
 #SBATCH --mem=200G                   # 内存限制
 #SBATCH --time=24:00:00             # 作业运行时间限制
@@ -24,12 +24,12 @@ convert_to_seconds() {
 
 start_time=$(date +%Y-%m-%d_%H:%M:%S)
 echo "Train start time: $start_time"
-torchrun --nnodes=1 --nproc_per_node=1 ../program/main.py\
-        --cpu 6\
-        --epochs 2\
+torchrun --nnodes=1 --nproc_per_node=1 --rdzv_id=101 --rdzv_endpoint=localhost:29505 ../program/main.py\
+        --cpu 3\
+        --epochs 500\
         --resume-epoch 1\
-        --database shallow_water\
-        --save-frequency 1\
+        --database weather_2m_temperature\
+        --save-frequency 10\
         --model-name imae
 
 # model-name: imae, convlstm, cae, cae_lstm 
@@ -38,8 +38,6 @@ torchrun --nnodes=1 --nproc_per_node=1 ../program/main.py\
 
 end_time=$(date +%Y-%m-%d_%H:%M:%S)
 echo "Train end time: $end_time"
-
-echo "Train Time taken: $hours hours, $minutes minutes and $seconds seconds"
 
 
 # start_time=$(date +%Y-%m-%d_%H:%M:%S)
@@ -67,4 +65,4 @@ echo "Train Time taken: $hours hours, $minutes minutes and $seconds seconds"
 # minutes=$(( (difference_seconds % 3600) / 60 ))
 # seconds=$((difference_seconds % 60))
 
-# echo "Test Time taken: $hours hours, $minutes minutes and $seconds seconds"
+ echo "Test Time taken: $hours hours, $minutes minutes and $seconds seconds"
